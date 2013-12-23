@@ -12,10 +12,12 @@ usage
 -----
 
 instantiate the api as follows, key is required, region defaults to euw
+
 api = lolapi.LolAPI(key = "YOUR KEY", region="euw")
 
 To get an overview of the methods you should do a quick dir(api) for now.
 All methods take an optional region argument that if not specified will use the default set when you called LolAPI
 
 example:
+
 summoner = api.get_summoner_by_name("Kruptein")
