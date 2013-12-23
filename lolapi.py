@@ -55,3 +55,8 @@ class LolAPI:
 		if region == "default":
 			region = self.region
 		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}/name&api_key={}".format(region, summonerIds, self.key)).json()
+
+	def get_teams(self, summonerId, region="default"):
+		if region == "default":
+			region = self.region
+		return requests.get(LolAPI.base + "{}/v2.2/team/by-summoner/{}&api_key={}".format(region, summonerId, self.key)).json()
