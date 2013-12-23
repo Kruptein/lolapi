@@ -30,3 +30,8 @@ class LolAPI:
 		if region == "default":
 			region = self.region
 		return requests.get(LolAPI.base + "{}/v1.2/stats/by-summoner/{}/ranked&api_key={}".format(region, summonerId, self.key)).json()
+
+	def get_masteries(self, summonerId, region="default"):
+		if region == "default":
+			region = self.region
+		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}/masteries&api_key={}".format(region, summonerId, self.key)).json()
