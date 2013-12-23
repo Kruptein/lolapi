@@ -10,3 +10,8 @@ class LolAPI:
 		if region == "default":
 			region = self.region
 		return requests.get(LolAPI.base + "{}/v1.1/champion?freeToPlay={}&api_key={}".format(region, str(freetoplay).lower(), self.key)).json()
+
+	def get_recent_games(self, summonerId, region="default"):
+		if region == "default":
+			region = self.region
+		return requests.get(LolAPI.base + "{}/v1.2/game/by-summoner/{}/recent&api_key={}".format(region, summonerId, self.key)).json()
