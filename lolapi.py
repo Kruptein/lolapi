@@ -41,7 +41,12 @@ class LolAPI:
 			region = self.region
 		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}/runes?api_key={}".format(region, summonerId, self.key)).json()
 
-	def get_summoner(self, name, region="default"):
+	def get_summoner_by_name(self, name, region="default"):
 		if region == "default":
 			region = self.region
 		return requests.get(LolAPI.base + "{}/v1.2/summoner/by-name/{}?&api_key={}".format(region, name, self.key)).json()
+
+	def get_summoner_by_id(self, summonerId, region="default"):
+		if region == "default":
+			region = self.region
+		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}?api_key={}".format(region, summonerId, self.key)).json()
