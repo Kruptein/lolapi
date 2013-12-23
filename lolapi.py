@@ -20,3 +20,8 @@ class LolAPI:
 		if region == "default":
 			region = self.region
 		return requests.get(LolAPI.base + "{}/v2.2/league/by-summoner/{}&api_key={}".format(region, summonerId, self.key)).json()
+
+		def get_stats(self, summonerId, region="default"):
+		if region == "default":
+			region = self.region
+		return requests.get(LolAPI.base + "{}/v1.2/stats/by-summoner/{}/summary&api_key={}".format(region, summonerId, self.key)).json()
