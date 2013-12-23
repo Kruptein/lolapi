@@ -14,29 +14,34 @@ class LolAPI:
 	def get_recent_games(self, summonerId, region="default"):
 		if region == "default":
 			region = self.region
-		return requests.get(LolAPI.base + "{}/v1.2/game/by-summoner/{}/recent&api_key={}".format(region, summonerId, self.key)).json()
+		return requests.get(LolAPI.base + "{}/v1.2/game/by-summoner/{}/recent?api_key={}".format(region, summonerId, self.key)).json()
 
 	def get_league(self, summonerId, region="default"):
 		if region == "default":
 			region = self.region
-		return requests.get(LolAPI.base + "{}/v2.2/league/by-summoner/{}&api_key={}".format(region, summonerId, self.key)).json()
+		return requests.get(LolAPI.base + "{}/v2.2/league/by-summoner/{}?api_key={}".format(region, summonerId, self.key)).json()
 
 	def get_stats(self, summonerId, region="default"):
 		if region == "default":
 			region = self.region
-		return requests.get(LolAPI.base + "{}/v1.2/stats/by-summoner/{}/summary&api_key={}".format(region, summonerId, self.key)).json()
+		return requests.get(LolAPI.base + "{}/v1.2/stats/by-summoner/{}/summary?api_key={}".format(region, summonerId, self.key)).json()
 
 	def get_ranked_stats(self, summonerId, region="default"):
 		if region == "default":
 			region = self.region
-		return requests.get(LolAPI.base + "{}/v1.2/stats/by-summoner/{}/ranked&api_key={}".format(region, summonerId, self.key)).json()
+		return requests.get(LolAPI.base + "{}/v1.2/stats/by-summoner/{}/ranked?api_key={}".format(region, summonerId, self.key)).json()
 
 	def get_masteries(self, summonerId, region="default"):
 		if region == "default":
 			region = self.region
-		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}/masteries&api_key={}".format(region, summonerId, self.key)).json()
+		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}/masteries?api_key={}".format(region, summonerId, self.key)).json()
 
 	def get_runes(self, summonerId, region="default"):
 		if region == "default":
 			region = self.region
-		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}/runes&api_key={}".format(region, summonerId, self.key)).json()
+		return requests.get(LolAPI.base + "{}/v1.2/summoner/{}/runes?api_key={}".format(region, summonerId, self.key)).json()
+
+	def get_summoner(self, name, region="default"):
+		if region == "default":
+			region = self.region
+		return requests.get(LolAPI.base + "{}/v1.2/summoner/by-name/{}?&api_key={}".format(region, name, self.key)).json()
