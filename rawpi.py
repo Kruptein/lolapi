@@ -235,6 +235,30 @@ def get_version_data(region):
         (GLOBAL_ENDPOINT + "v1.2/versions?api_key={1}").
         format(region, KEY))
 
+# MATCH-v2.2
+
+
+def get_match(region, matchId, includeTimeline):
+    """
+    Retrieve match by match ID.
+    """
+    return requests.get(
+        (REGION_ENDPOINT + "v2.2/match/{1}?"
+         "api_key={2}&includeTimeline={3}").
+        format(region, matchId, KEY, includeTimeline))
+
+# MATCHHISTORY-v2.2
+
+
+def get_matchhistory(region, summonerId):
+    """
+    Retrieve match history by summoner ID.
+    """
+    return requests.get(
+        (REGION_ENDPOINT + "v2.2/matchhistory/{1}?"
+         "api_key={2}").
+        format(region, summonerId, KEY))
+
 # STATS-v1.3
 
 
@@ -245,7 +269,7 @@ def get_ranked_stats(region, summonerId, season=""):
     return requests.get(
         (REGION_ENDPOINT + "v1.3/stats/by-summoner/{1}/ranked?"
          "api_key={2}&season={3}").
-        format(region, summonerId, season, KEY))
+        format(region, summonerId, KEY, season))
 
 
 def get_stats(region, summonerId, season=""):
@@ -255,7 +279,7 @@ def get_stats(region, summonerId, season=""):
     return requests.get(
         (REGION_ENDPOINT +
          "v1.3/stats/by-summoner/{1}/summary?api_key={2}&season={3}").
-        format(region, summonerId, season, KEY))
+        format(region, summonerId, KEY, season))
 
 # SUMMONER-v1.4
 
