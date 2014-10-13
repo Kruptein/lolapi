@@ -56,7 +56,7 @@ def get_recent_games(region, summonerId):
         (REGION_ENDPOINT + "v1.3/game/by-summoner/{1}/recent?api_key={2}").
         format(region, summonerId, KEY))
 
-# LEAGUE-v2.4
+# LEAGUE-v2.5
 
 
 def get_league(region, summonerIds):
@@ -64,7 +64,7 @@ def get_league(region, summonerIds):
     Get leagues mapped by summoner ID for a given list of summoner IDs.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.4/league/by-summoner/{1}?api_key={2}").
+        (REGION_ENDPOINT + "v2.5/league/by-summoner/{1}?api_key={2}").
         format(region, summonerIds, KEY))
 
 
@@ -74,7 +74,7 @@ def get_league_entry(region, summonerIds):
     for a given list of summoner IDs.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.4/league/by-summoner/{1}/entry?api_key={2}").
+        (REGION_ENDPOINT + "v2.5/league/by-summoner/{1}/entry?api_key={2}").
         format(region, summonerIds, KEY))
 
 
@@ -83,7 +83,7 @@ def get_league_by_team(region, teamIds):
     Get leagues mapped by team ID for a given list of team IDs.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.4/league/by-team/{1}?api_key={2}").
+        (REGION_ENDPOINT + "v2.5/league/by-team/{1}?api_key={2}").
         format(region, teamIds, KEY))
 
 
@@ -92,7 +92,7 @@ def get_league_entry_by_team(region, teamIds):
     Get league entries by team ID for a given list of team IDs.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.4/league/by-team/{1}?api_key={2}").
+        (REGION_ENDPOINT + "v2.5/league/by-team/{1}?api_key={2}").
         format(region, teamIds, KEY))
 
 
@@ -101,7 +101,7 @@ def get_challenger_league_tiers(region, queuetype):
     Get challenger tier leagues.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.4/league/challenger?type={1}&api_key={2}").
+        (REGION_ENDPOINT + "v2.5/league/challenger?type={1}&api_key={2}").
         format(region, queuetype, KEY))
 
 # LOL-STATIC-DATA-v1.2
@@ -235,6 +235,25 @@ def get_version_data(region):
         (GLOBAL_ENDPOINT + "v1.2/versions?api_key={1}").
         format(region, KEY))
 
+# LOL-STATUS-v1.0
+
+
+def get_shards():
+    """
+    Get shard list.
+    """
+    return requests.get("http://status.leagueoflegends.com/shards")
+
+
+def get_shard_status(region):
+    """
+    Get shard status.
+    Returns the data available on the status.leagueoflegends.com website
+    for given region.
+    """
+    return requests.get("http://status.leagueoflegends.com/shards/{}"
+                        .format(region))
+
 # MATCH-v2.2
 
 
@@ -333,7 +352,7 @@ def get_runes(region, summonerIds):
         (REGION_ENDPOINT + "v1.4/summoner/{1}/runes?api_key={2}").
         format(region, summonerIds, KEY))
 
-# TEAM-v2.3
+# TEAM-v2.4
 
 
 def get_teams_by_summonerid(region, summonerIds):
@@ -342,7 +361,7 @@ def get_teams_by_summonerid(region, summonerIds):
     for a given list of summoner IDs.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.3/team/by-summoner/{1}?api_key={2}").
+        (REGION_ENDPOINT + "v2.4/team/by-summoner/{1}?api_key={2}").
         format(region, summonerIds, KEY))
 
 
@@ -352,5 +371,5 @@ def get_teams(region, teamIds):
     for a given list of team IDs.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.3/team/{1}?api_key={2}").
+        (REGION_ENDPOINT + "v2.4/team/{1}?api_key={2}").
         format(region, teamIds, KEY))
