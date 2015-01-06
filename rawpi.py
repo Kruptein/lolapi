@@ -14,7 +14,7 @@ with open(os.path.join(__location__, 'config'), 'r') as f:
         config = {'key': ""}
 
 KEY = config["key"]
-GLOBAL_ENDPOINT = "https://global.api.pvp.net/api/lol/static-data/{}/"
+GLOBAL_ENDPOINT = "https://global.api.pvp.net/api/lol/static-data/{0}/"
 REGION_ENDPOINT = "https://{0}.api.pvp.net/api/lol/{0}/"
 
 
