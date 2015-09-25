@@ -266,17 +266,17 @@ def get_match(region, matchId, includeTimeline):
          "api_key={2}&includeTimeline={3}").
         format(region, matchId, KEY, includeTimeline))
 
-# MATCHHISTORY-v2.2
+# MATCHLIST-v2.2
 
 
-def get_matchhistory(region, summonerId):
+def get_matchlist(region, summonerId, championIds="", rankedQueues="", seasons="", beginTime="", endTime="", beginIndex="", endIndex=""):
     """
     Retrieve match history by summoner ID.
     """
     return requests.get(
-        (REGION_ENDPOINT + "v2.2/matchhistory/{1}?"
-         "api_key={2}").
-        format(region, summonerId, KEY))
+        (REGION_ENDPOINT + "v2.2/matchlist/by-summoner/{1}?"
+         "api_key={2}&championIds={3}&rankedQueues={4}&seasons={5}&beginTime={6}&endTime={7}&beginIndex={8}&endIndex={9}").
+        format(region, summonerId, KEY, championIds, rankedQueues, seasons, beginTime, endTime, beginIndex, endIndex))
 
 # STATS-v1.3
 
