@@ -45,6 +45,26 @@ def get_champion(region, championId):
         (REGION_ENDPOINT + "v1.2/champion/{1}?api_key={2}").
         format(region, championId, KEY))
 
+
+# CURRENT-GAME-v1.0
+
+
+def get_current_game(region, platformId, summonerId):
+    """
+    Get current game information for the given summoner ID.
+    """
+    return requests.get("https://{0}.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/{1}/{2}?api_key={3}".format(region, platformId, summonerId, KEY))
+
+
+# FEATURED-GAMES-v1.0
+
+def get_featured_games(region):
+    """
+    Get list of featured games.
+    """
+    return requests.get("https://{0}.api.pvp.net/observer-mode/rest/featured?api_key={1}".format(region, KEY))
+
+
 # GAME-v1.3
 
 
