@@ -18,10 +18,16 @@ GLOBAL_ENDPOINT = "https://global.api.pvp.net/api/lol/static-data/{0}/"
 REGION_ENDPOINT = "https://{0}.api.pvp.net/api/lol/{0}/"
 
 
-def set_api_key(key):
+def set_api_key(key, save=False):
+    """
+    Set the api key to the given value.
+    If save is True, the key will be saved in the config file and
+    will be automatically used when importing rawpi in the future.
+    """
     global KEY
-    with open('config', 'w') as f:
-        json.dump({"key": key}, f)
+    if save:
+        with open('config', 'w') as f:
+            json.dump({"key": key}, f)
     KEY = key
 
 
