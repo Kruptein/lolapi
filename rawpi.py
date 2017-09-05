@@ -1,6 +1,10 @@
 import os
 import json
 import requests
+
+from functools import wraps
+from utils import QueryBuilder
+
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -10,12 +14,16 @@ __location__ = os.path.realpath(
 with open(os.path.join(__location__, 'config'), 'r') as f:
     try:
         config = json.load(f)
-    except ValueError:
-        config = {'key': ""}
+    except ValueError: config = {'key': ""}
 
-KEY = config["key"]
+DEFAULT_VALUES = {
+    'region': 'euw1',
+    'locale': 'en_US'
+}
 GLOBAL_ENDPOINT = "https://global.api.pvp.net/api/lol/static-data/{0}/"
-REGION_ENDPOINT = "https://{0}.api.pvp.net/api/lol/{0}/"
+REGION_ENDPOINT = "https://{0}.api.riotgames.com/lol/"
+
+HEADERS = { "X-Riot-Token": config["key"] }
 
 
 def set_api_key(key, save=False):
@@ -24,378 +32,433 @@ def set_api_key(key, save=False):
     If save is True, the key will be saved in the config file and
     will be automatically used when importing rawpi in the future.
     """
-    global KEY
+    global HEADERS
     if save:
         with open('config', 'w') as f:
             json.dump({"key": key}, f)
-    KEY = key
-
-
-# CHAMPION-v1.2
-
-
-def get_champions(region, freetoplay="false"):
-    """
-    Retrieve all champions.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.2/champion?freeToPlay={1}&api_key={2}").
-        format(region, freetoplay, KEY))
-
-
-def get_champion(region, championId):
-    """
-    Retrieve champion by ID.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.2/champion/{1}?api_key={2}").
-        format(region, championId, KEY))
-
-
-# CURRENT-GAME-v1.0
-
-
-def get_current_game(region, platformId, summonerId):
-    """
-    Get current game information for the given summoner ID.
-    """
-    return requests.get("https://{0}.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/{1}/{2}?api_key={3}".format(region, platformId, summonerId, KEY))
-
-
-# FEATURED-GAMES-v1.0
-
-def get_featured_games(region):
-    """
-    Get list of featured games.
-    """
-    return requests.get("https://{0}.api.pvp.net/observer-mode/rest/featured?api_key={1}".format(region, KEY))
-
-
-# GAME-v1.3
-
-
-def get_recent_games(region, summonerId):
-    """
-    Get recent games by summoner ID.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.3/game/by-summoner/{1}/recent?api_key={2}").
-        format(region, summonerId, KEY))
-
-# LEAGUE-v2.5
-
-
-def get_league(region, summonerIds):
-    """
-    Get leagues mapped by summoner ID for a given list of summoner IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.5/league/by-summoner/{1}?api_key={2}").
-        format(region, summonerIds, KEY))
-
-
-def get_league_entry(region, summonerIds):
-    """
-    Get league entries mapped by summoner ID
-    for a given list of summoner IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.5/league/by-summoner/{1}/entry?api_key={2}").
-        format(region, summonerIds, KEY))
-
-
-def get_league_by_team(region, teamIds):
-    """
-    Get leagues mapped by team ID for a given list of team IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.5/league/by-team/{1}?api_key={2}").
-        format(region, teamIds, KEY))
-
-
-def get_league_entry_by_team(region, teamIds):
-    """
-    Get league entries by team ID for a given list of team IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.5/league/by-team/{1}?api_key={2}").
-        format(region, teamIds, KEY))
-
-
-def get_challenger_league_tiers(region, queuetype):
-    """
-    Get challenger tier leagues.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.5/league/challenger?type={1}&api_key={2}").
-        format(region, queuetype, KEY))
-
-# LOL-STATIC-DATA-v1.2
-
-
-def get_champion_list(
-        region, locale="", version="",
-        dataById="", champData=""):
-    """
-    Retrieves champion list.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/champion?locale={1}&version={2}"
-         "&dataById={3}&champData={4}&api_key={5}").
-        format(region, locale, version, dataById, champData, KEY))
-
-
-def get_champion_list_by_id(
-        region, championId, locale="", version="", champData=""):
-    """
-    Retrieves a champion by its id.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/champion/{1}?locale={2}"
-         "&version={3}&champData={4}&api_key={5}")
-        .format(region, championId, locale, version, champData, KEY))
-
-
-def get_item_list(
-        region, locale="", version="", itemListData=""):
-    """
-    Retrieves item list.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/item?locale={1}&version={2}"
-         "&itemListData={3}&api_key={4}").
-        format(region, locale, version, itemListData, KEY))
-
-
-def get_item_list_by_id(
-        region, itemId, locale="", version="", itemData=""):
-    """
-    Retrieves item by its unique id.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/item/{1}?locale={2}"
-         "&version={3}&itemData={4}&api_key={5}")
-        .format(region, itemId, locale, version, itemData, KEY))
-
-
-def get_mastery_list(
-        region, locale="", version="", masteryListData=""):
-    """
-    Retrieves mastery list.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/mastery?locale={1}&version={2}"
-         "&masteryListData={3}&api_key={4}").
-        format(region, locale, version, masteryListData, KEY))
-
-
-def get_mastery_list_by_id(
-        region, masteryId, locale="", version="", masteryData=""):
-    """
-    Retrieves mastery item by its unique id.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/item/{1}?locale={2}"
-         "&version={3}&masteryData={4}&api_key={5}")
-        .format(region, masteryId, locale, version, masteryData, KEY))
-
-
-def get_realm_data(region):
-    """
-    Retrieves realm data.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/realm?api_key={1}").
-        format(region, KEY))
-
-
-def get_rune_list(region, locale="", version="", runeListData=""):
-    """
-    Retrieves rune list.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/rune?locale={1}&version={2}"
-         "&runeListData={3}&api_key={4}").
-        format(region, locale, version, runeListData, KEY))
-
-
-def get_rune_list_by_id(
-        region, runeId, locale="", version="", runeData=""):
-    """
-    Retrieves rune by its unique id.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/rune/{}?locale={1}"
-         "&version={2}&runeData={3}&api_key={4}")
-        .format(region, runeId, locale, version, runeData, KEY))
-
-
-def get_spell_list(
-        region, locale="", version="",
-        dataById="", spellData=""):
-    """
-    Retrieves summoner spell list.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/summoner-spell?locale={1}&version={2}"
-         "&dataById={3}&spellData={4}&api_key={5}").
-        format(region, locale, version, dataById, spellData, KEY))
-
-
-def get_spell_list_by_id(
-        region, spellId, locale="", version="", spellData=""):
-    """
-    Retrieves summoner spell by its unique id.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/summoner-spell/{1}?locale={2}"
-         "&version={3}&spellData={4}&api_key={5}")
-        .format(region, spellId, locale, version, spellData, KEY))
-
-
-def get_version_data(region):
-    """
-    Retrieves version data.
-    """
-    return requests.get(
-        (GLOBAL_ENDPOINT + "v1.2/versions?api_key={1}").
-        format(region, KEY))
-
-# LOL-STATUS-v1.0
-
-
-def get_shards():
-    """
-    Get shard list.
-    """
-    return requests.get("http://status.leagueoflegends.com/shards")
-
-
-def get_shard_status(region):
-    """
-    Get shard status.
-    Returns the data available on the status.leagueoflegends.com website
-    for given region.
-    """
-    return requests.get("http://status.leagueoflegends.com/shards/{}"
-                        .format(region))
-
-# MATCH-v2.2
-
-
-def get_match(region, matchId, includeTimeline):
-    """
-    Retrieve match by match ID.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.2/match/{1}?"
-         "api_key={2}&includeTimeline={3}").
-        format(region, matchId, KEY, includeTimeline))
-
-# MATCHLIST-v2.2
-
-
-def get_matchlist(region, summonerId, championIds="", rankedQueues="", seasons="", beginTime="", endTime="", beginIndex="", endIndex=""):
-    """
-    Retrieve match history by summoner ID.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.2/matchlist/by-summoner/{1}?"
-         "api_key={2}&championIds={3}&rankedQueues={4}&seasons={5}&beginTime={6}&endTime={7}&beginIndex={8}&endIndex={9}").
-        format(region, summonerId, KEY, championIds, rankedQueues, seasons, beginTime, endTime, beginIndex, endIndex))
-
-# STATS-v1.3
-
-
-def get_ranked_stats(region, summonerId, season=""):
-    """
-    Get ranked stats by summoner ID.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.3/stats/by-summoner/{1}/ranked?"
-         "api_key={2}&season={3}").
-        format(region, summonerId, KEY, season))
-
-
-def get_stats(region, summonerId, season=""):
-    """
-    Get player stats summaries by summoner ID.
-    """
-    return requests.get(
-        (REGION_ENDPOINT +
-         "v1.3/stats/by-summoner/{1}/summary?api_key={2}&season={3}").
-        format(region, summonerId, KEY, season))
-
-# SUMMONER-v1.4
-
-
-def get_summoner_by_name(region, summonerNames):
-    """
-    Get summoner objects mapped by standardized summoner name
-    for a given list of summoner names.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.4/summoner/by-name/{1}?&api_key={2}").
-        format(region, summonerNames, KEY))
-
-
-def get_summoner_by_id(region, summonerIds):
-    """
-    Get summoner objects mapped by summoner ID
-    for a given list of summoner IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.4/summoner/{1}?api_key={2}").
-        format(region, summonerIds, KEY))
-
-
-def get_masteries(region, summonerIds):
-    """
-    Get mastery pages mapped by summoner ID
-    for a given list of summoner IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.4/summoner/{1}/masteries?api_key={2}").
-        format(region, summonerIds, KEY))
-
-
-def get_name(region, summonerIds):
-    """
-    Get summoner names mapped by summoner ID
-    for a given list of summoner IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.4/summoner/{1}/name?api_key={2}").
-        format(region, summonerIds, KEY))
-
-
-def get_runes(region, summonerIds):
-    """
-    Get rune pages mapped by summoner ID
-    for a given list of summoner IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v1.4/summoner/{1}/runes?api_key={2}").
-        format(region, summonerIds, KEY))
-
-# TEAM-v2.4
-
-
-def get_teams_by_summonerid(region, summonerIds):
-    """
-    Get teams mapped by summoner ID
-    for a given list of summoner IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.4/team/by-summoner/{1}?api_key={2}").
-        format(region, summonerIds, KEY))
-
-
-def get_teams(region, teamIds):
-    """
-    Get teams mapped by team ID
-    for a given list of team IDs.
-    """
-    return requests.get(
-        (REGION_ENDPOINT + "v2.4/team/{1}?api_key={2}").
-        format(region, teamIds, KEY))
+    HEADERS["X-Riot-Token"] = key
+
+
+def set_default_value(key, value):
+    global DEFAULT_VALUES
+    DEFAULT_VALUES[key] = value
+
+
+# DECORATORS
+
+def default_values(func):
+    @wraps(func)
+    def wrapper(cls, *args, **kwargs):
+        for key, _ in func.__kwdefaults__:
+            if key not in kwargs and key in DEFAULT_VALUES:
+                kwargs[key] = DEFAULT_VALUES[key]
+        return func(cls, *args, **kwargs)
+    return wrapper
+
+# ENDPOINTS
+
+class Endpoint:
+    ENDPOINT = ''
+
+    @classmethod
+    def rget(cls, region: str, url: str):
+        """
+        Do a requests get call on the provided region endpoint an method url.
+        """
+        return requests.get((REGION_ENDPOINT + cls.ENDPOINT + url).format(region), headers=HEADERS)
+
+
+class ChampionMastery(Endpoint):
+    ENDPOINT = "champion-mastery"
+
+    @classmethod
+    @default_values
+    def by_summoner(cls, summoner_id, *, region=None):
+        """
+        Get all champion mastery entries sorted by number of champion points descending.
+        """
+        return cls.rget(region, "/v3/champion-masteries/by-summoner/{}".format(summoner_id))
+
+    @classmethod
+    @default_values
+    def by_champion(cls, summoner_id, champion_id, *, region=None):
+        """
+        Get a champion mastery by player ID and champion ID.
+        """
+        return cls.rget(region, "/v3/champion-masteries/by-summoner/{}/by-champion/{}".format(summoner_id, champion_id))
+
+    @classmethod
+    @default_values
+    def score(cls, summoner_id, *, region=None):
+        """
+        Get a player's total champion mastery score, which is the sum of individual champion mastery levels.
+        """
+        return cls.rget(region, "/v3/scores/by-summoner/{}".format(summoner_id))
+
+
+class Champion(Endpoint):
+    ENDPOINT = "platform"
+    
+    @classmethod
+    @default_values
+    def champions(cls, *, freetoplay=False, region=None):
+        """
+        Retrieve all champions.
+        """
+        freetoplay = "true" if freetoplay else "false"
+        return cls.rget(region, "/v3/champions?freetoplay=".format(freetoplay))
+
+    @classmethod
+    @default_values
+    def by_id(cls, champion_id, *, region=None):
+        """
+        Retrieve champion by ID.
+        """
+        return cls.rget(region, "/v3/champions/{}".format(champion_id))
+
+
+class League(Endpoint):
+    ENDPOINT = 'league'
+
+    @classmethod
+    @default_values
+    def challenger(cls, queue, *, region=None):
+        """
+        Get the challenger league for a given queue.
+        """
+        return cls.rget(region, "/v3/challengerleagues/by-queue/{}".format(queue))
+
+    @classmethod
+    @default_values
+    def master(cls, queue, *, region=None):
+        """
+        Get the master league for a given queue.
+        """
+        return cls.rget(region, "/v3/masterleagues/by-queue/{}".format(queue))
+
+    @classmethod
+    @default_values
+    def leagues(cls, summoner_id, *, region=None):
+        """
+        Get leagues in all queues for a given summoner ID.
+        """
+        return cls.rget(region, "/v3/leagues/by-summoner/{}".format(summoner_id))
+
+    @classmethod
+    @default_values
+    def positions(cls, summoner_id, *, region=None):
+        """
+        Get leagues in all queues for a given summoner ID.
+        """
+        return cls.rget(region, "/v3/positions/by-summoner/{}".format(summoner_id))
+
+
+class LolStaticData(Endpoint):
+    ENDPOINT = "static-data"
+
+    @classmethod
+    @default_values
+    def champions(cls, *,locale="", version=None, tags=None, data_by_id=False, region=None):
+        """
+        Retrieves champion list.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        query.add_bool(data_by_id)
+        return cls.rget(region, "/v3/champions{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def champion(cls, champion_id, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves champion ID.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/champions/{}{}".format(champion_id, query.build()))
+
+    @classmethod
+    @default_values
+    def items(cls, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves item list.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/items?{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def item(cls, item_id, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves item ID.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/items/{}?{}".format(item_id, query.build()))
+
+    @classmethod
+    @default_values
+    def language_strings(cls, *,locale="", version=None, region=None):
+        """
+        Retrieve language strings data.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        return cls.rget(region, "/v3/language-strings?{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def languages(cls, *, region=None):
+        """
+        Retrieves supported languages data.
+        """
+        return cls.rget(region, "/v3/languages")
+
+    @classmethod
+    @default_values
+    def maps(cls, *,locale="", version=None, region=None):
+        """
+        Retrieve map data.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        return cls.rget(region, "/v3/maps?{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def masteries(cls, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves mastery list.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/masteries?{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def mastery(cls, mastery_id, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves mastery item by ID.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/masteries/{}?{}".format(mastery_id, query.build()))
+
+    @classmethod
+    @default_values
+    def profile_icons(cls, *,locale="", version=None, region=None):
+        """
+        Retrieve profile icons.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        return cls.rget(region, "/v3/profile_icons?{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def realms(cls, *, region=None):
+        """
+        Retrieve realm data.
+        """
+        return cls.rget(region, "/v3/realms")
+
+    @classmethod
+    @default_values
+    def runes(cls, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves rune list.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/runes?{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def rune(cls, rune_id, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves rune by ID.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/runes/{}?{}".format(rune_id, query.build()))
+
+    @classmethod
+    @default_values
+    def summoner_spells(cls, *,locale="", version=None, tags=None, data_by_id=False, region=None):
+        """
+        Retrieves summoner spell list.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        query.add_bool(data_by_id)
+        return cls.rget(region, "/v3/summoner-spells?{}".format(query.build()))
+
+    @classmethod
+    @default_values
+    def summoner_spell(cls, summoner_spell_id, *,locale="", version=None, tags=None, region=None):
+        """
+        Retrieves summoner spell by ID.
+        """
+        query = QueryBuilder()
+        query.add_string(locale)
+        query.add_string(version)
+        query.add_set(tags)
+        return cls.rget(region, "/v3/summoner-spells/{}?{}".format(summoner_spell_id, query.build()))
+
+    @classmethod
+    @default_values
+    def versions(cls, *, region=None):
+        """
+        Retrieve version data.
+        """
+        return cls.rget(region, "/v3/versions")
+
+
+class LolStatus(Endpoint):
+    ENDPOINT = "status"
+
+    @classmethod
+    @default_values
+    def shard_data(cls, *, region=None):
+        """
+        Get League of Legends status for the given shard.
+        """
+        return cls.rget(region, "/v3/shard-data")
+
+
+class Masteries(Endpoint):
+    ENDPOINT = "platform"
+
+    @classmethod
+    @default_values
+    def by_summoner(cls, summoner_id, *, region=None):
+        """
+        Get mastery pages for a given summoner ID.
+        """
+        return cls.rget(region, "/v3/masteries/by-summoner/{}".format(summoner_id))
+
+
+class Match(Endpoint):
+    ENDPOINT = "match"
+
+    @classmethod
+    @default_values
+    def by_match(cls, match_id, *, region=None):
+        """
+        Get match by match ID.
+        """
+        return cls.rget(region, "/v3/matches/{}".format(match_id))
+
+    @classmethod
+    @default_values
+    def by_account(cls, account_id, *, queue=None, endTime=None, beginIndex=None, beginTime=None, season=None, champion=None, endIndex=None, region=None):
+        """
+        Get match by account ID.
+        """
+        query = QueryBuilder()
+        query.add_set(queue)
+        query.add_int(endTime)
+        query.add_int(beginIndex)
+        query.add_int(beginTime)
+        query.add_set(season)
+        query.add_set(champion)
+        query.add_int(endIndex)
+        return cls.rget(region, "/v3/matchlists/by-account/{}{}".format(account_id, query.build()))
+
+    @classmethod
+    @default_values
+    def recent(cls, account_id, *, region=None):
+        """
+        Get matchlist for last 20 matches played on given account ID and platform ID.
+        """
+        return cls.rget(region, "/v3/matchlists/by-account/{}/recent".format(account_id))
+
+    @classmethod
+    @default_values
+    def timeline(cls, match_id, *, region=None):
+        """
+        Get match timeline by match ID.
+        """
+        return cls.rget(region, "/v3/timelines/by-match/{}".format(match_id))
+
+
+class Runes(Endpoint):
+    ENDPOINT = "platform"
+
+    @classmethod
+    @default_values
+    def by_summoner(cls, summoner_id, *, region=None):
+        """
+        Get rune pages for a given summoner ID.
+        """
+        return cls.rget(region, "/v3/runes/by-summoner/{}".format(summoner_id))
+
+
+class Spectator(Endpoint):
+    ENDPOINT = "spectator"
+
+    @classmethod
+    @default_values
+    def by_summoner(cls, summoner_id, *, region=None):
+        """
+        Get current game information for the given summoner ID.
+        """
+        return cls.rget(region, "/v3/active-games/by-summoner/{}".format(summoner_id))
+
+    @classmethod
+    @default_values
+    def featured(cls, *, region=None):
+        """
+        Get list of featured games.
+        """
+        return cls.rget(region, "/v3/featured-games")
+
+
+class Summoner(Endpoint):
+    ENDPOINT = "summoner"
+
+    @classmethod
+    @default_values
+    def by_account(cls, account_id, *, region=None):
+        """
+        Get a summoner by account ID.
+        """
+        return cls.rget(region, "/v3/summoners/by-account/{}".format(account_id))
+
+    @classmethod
+    @default_values
+    def by_name(cls, summoner_name, *, region=None):
+        """
+        Get a summoner by summoner name.
+        """
+        return cls.rget(region, "/v3/summoners/by-name/{}".format(summoner_name))
+
+    @classmethod
+    @default_values
+    def by_summoner(cls, summoner_id, *, region=None):
+        """
+        Get a summoner by summoner ID.
+        """
+        return cls.rget(region, "/v3/summoners/by-summoner/{}".format(summoner_id))
