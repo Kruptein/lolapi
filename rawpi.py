@@ -49,11 +49,13 @@ def set_default_value(key, value):
 def default_values(func):
     @wraps(func)
     def wrapper(cls, *args, **kwargs):
-        for key, _ in func.__kwdefaults__:
+        print(func.__kwdefaults__)
+        for key in func.__kwdefaults__:
             if key not in kwargs and key in DEFAULT_VALUES:
                 kwargs[key] = DEFAULT_VALUES[key]
         return func(cls, *args, **kwargs)
     return wrapper
+
 
 # ENDPOINTS
 
