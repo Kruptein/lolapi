@@ -4,6 +4,10 @@ import time
 redis = re.StrictRedis()
 
 def _string_to_dict(string:str):
+    """
+    Translate the riot provided ratelimit strings to a python dict.
+    Example: '100:120,20:1' is translated to {120: 100, 1: 20}
+    """
     d = {}
     for pair in string.split(","):
         value, key = pair.split(":")
@@ -11,6 +15,9 @@ def _string_to_dict(string:str):
     return d
 
 def redis_wrap(cls):
+    """
+    A convenient wrapper that can be used to decorate an endpoint to provide it with redis based rate limit support.
+    """
     class RedisRateLimitedEndpoint(cls):
 
         @classmethod
@@ -26,6 +33,10 @@ def redis_wrap(cls):
 
         @classmethod
         def wait(clz, url:str):
+            """
+            Check to see if any ratelimit will be violated and if this is the case sleep.
+            Also clears any old data that is no longer relevant from the redis cache.
+            """
             limits = redis.hgetall("app_limits")
             for limit in limits:
                 key_str = "app_limits:{}".format(int(limit))
@@ -39,6 +50,14 @@ def redis_wrap(cls):
 
         @classmethod
         def ratelimit(clz, response):
+            """
+            Add this request to the ratelimit cache to make sure any future calls will not violate the limits.
+            Calls that are not made through this rate limit method are still accounted for during the next call of this method.
+            (i.e. if the amount of actual calls made to the api differ from the amount of local calls cached, the difference will be added to the cache as if it was added now.)
+            This will also clean any stale records on startup.
+
+            The response object should be a requests style object that contains the headers of the api request.
+            """
             # Not every endpoint is ratelimited, use -1 to signify this.
             try:
                 app_rate_limit = _string_to_dict(response.headers.get("X-App-Rate-Limit", ""))
