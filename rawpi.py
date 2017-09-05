@@ -3,6 +3,8 @@ import json
 import requests
 
 from functools import wraps
+
+from limit import redis_wrap
 from utils import QueryBuilder
 
 __location__ = os.path.realpath(
@@ -49,7 +51,6 @@ def set_default_value(key, value):
 def default_values(func):
     @wraps(func)
     def wrapper(cls, *args, **kwargs):
-        print(func.__kwdefaults__)
         for key in func.__kwdefaults__:
             if key not in kwargs and key in DEFAULT_VALUES:
                 kwargs[key] = DEFAULT_VALUES[key]
@@ -57,8 +58,16 @@ def default_values(func):
     return wrapper
 
 
+def ratelimit(cls):
+    return redis_wrap(cls)
+    # if ratelimits_apply():
+    #     return RedisRateLimitedEndpoint
+    # return cls
+
+
 # ENDPOINTS
 
+@ratelimit
 class Endpoint:
     ENDPOINT = ''
 
