@@ -4,8 +4,8 @@ import requests
 
 from functools import wraps
 
-from limit import redis_wrap
-from utils import QueryBuilder
+from .limit import redis_wrap
+from .utils import QueryBuilder
 
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
