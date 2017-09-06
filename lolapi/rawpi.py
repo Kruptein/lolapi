@@ -174,10 +174,10 @@ class LolStaticData(Endpoint):
         Retrieves champion list.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
-        query.add_bool(data_by_id)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
+        query.add_bool("dataById", data_by_id)
         return cls.rget(region, "/v3/champions{}".format(query.build()))
 
     @classmethod
@@ -187,9 +187,9 @@ class LolStaticData(Endpoint):
         Retrieves champion ID.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
         return cls.rget(region, "/v3/champions/{}{}".format(champion_id, query.build()))
 
     @classmethod
@@ -199,9 +199,9 @@ class LolStaticData(Endpoint):
         Retrieves item list.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
         return cls.rget(region, "/v3/items?{}".format(query.build()))
 
     @classmethod
@@ -211,9 +211,9 @@ class LolStaticData(Endpoint):
         Retrieves item ID.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
         return cls.rget(region, "/v3/items/{}?{}".format(item_id, query.build()))
 
     @classmethod
@@ -223,8 +223,8 @@ class LolStaticData(Endpoint):
         Retrieve language strings data.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
         return cls.rget(region, "/v3/language-strings?{}".format(query.build()))
 
     @classmethod
@@ -242,8 +242,8 @@ class LolStaticData(Endpoint):
         Retrieve map data.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
         return cls.rget(region, "/v3/maps?{}".format(query.build()))
 
     @classmethod
@@ -253,9 +253,9 @@ class LolStaticData(Endpoint):
         Retrieves mastery list.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
         return cls.rget(region, "/v3/masteries?{}".format(query.build()))
 
     @classmethod
@@ -265,9 +265,9 @@ class LolStaticData(Endpoint):
         Retrieves mastery item by ID.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
         return cls.rget(region, "/v3/masteries/{}?{}".format(mastery_id, query.build()))
 
     @classmethod
@@ -277,8 +277,8 @@ class LolStaticData(Endpoint):
         Retrieve profile icons.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
         return cls.rget(region, "/v3/profile_icons?{}".format(query.build()))
 
     @classmethod
@@ -296,9 +296,9 @@ class LolStaticData(Endpoint):
         Retrieves rune list.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
         return cls.rget(region, "/v3/runes?{}".format(query.build()))
 
     @classmethod
@@ -308,9 +308,9 @@ class LolStaticData(Endpoint):
         Retrieves rune by ID.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
         return cls.rget(region, "/v3/runes/{}?{}".format(rune_id, query.build()))
 
     @classmethod
@@ -320,10 +320,10 @@ class LolStaticData(Endpoint):
         Retrieves summoner spell list.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
-        query.add_bool(data_by_id)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set('tags', tags)
+        query.add_bool("dataById", data_by_id)
         return cls.rget(region, "/v3/summoner-spells?{}".format(query.build()))
 
     @classmethod
@@ -333,9 +333,9 @@ class LolStaticData(Endpoint):
         Retrieves summoner spell by ID.
         """
         query = QueryBuilder()
-        query.add_string(locale)
-        query.add_string(version)
-        query.add_set(tags)
+        query.add_string("locale", locale)
+        query.add_string("version", version)
+        query.add_set("tags", tags)
         return cls.rget(region, "/v3/summoner-spells/{}?{}".format(summoner_spell_id, query.build()))
 
     @classmethod
@@ -389,13 +389,13 @@ class Match(Endpoint):
         Get match by account ID.
         """
         query = QueryBuilder()
-        query.add_set(queue)
-        query.add_int(endTime)
-        query.add_int(beginIndex)
-        query.add_int(beginTime)
-        query.add_set(season)
-        query.add_set(champion)
-        query.add_int(endIndex)
+        query.add_set('queue', queue)
+        query.add_int("endTime", endTime)
+        query.add_int("beginIndex", beginIndex)
+        query.add_int("beginTime", beginTime)
+        query.add_set("season", season)
+        query.add_set("champion", champion)
+        query.add_int("endIndex", endIndex)
         return cls.rget(region, "/v3/matchlists/by-account/{}{}".format(account_id, query.build()))
 
     @classmethod
