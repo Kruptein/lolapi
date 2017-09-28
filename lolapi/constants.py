@@ -397,4 +397,4 @@ GAMEMODES = {
 
 
 def get_live_queue(old_queue_id: int):
-    return GAMEMODES[DEPRECATION_MAP.get(old_queue_id, old_queue_id)]
+    return MATCHMAKING_QUEUES[DEPRECATION_MAP.get(old_queue_id, old_queue_id)]
