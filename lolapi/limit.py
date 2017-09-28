@@ -26,9 +26,13 @@ def redis_wrap(cls):
             Rate limited version of the Endpoint.rget method.
             Redis is used as a backend to keep track of rate limits for both app and method limits.
             """
-            clz.wait(url)
-            response = super().rget(region, url)
-            clz.ratelimit(response)
+            try:
+                redis.incr("lolapi_clients")
+                clz.wait(url)
+                response = super().rget(region, url)
+                clz.ratelimit(response)
+            finally:
+                redis.decr("lolapi_clients")
             return response
 
         @classmethod
@@ -40,10 +44,13 @@ def redis_wrap(cls):
             limits = redis.hgetall("app_limits")
             for limit in limits:
                 key_str = "app_limits:{}".format(int(limit))
-                if redis.zcard(key_str) >= int(limits[limit]):
+                # TODO: look into the -1 on small limits
+                # If we have multiple clients race conditions can occur around the limits
+                # We attempt to overcome this by decreasing the limit in function of the amount of clients.
+                if redis.zcard(key_str) >= int(limits[limit]) - int(redis.get("lolapi_clients")):
                     redis.zremrangebyscore(key_str, '-inf', redis.time()[0] - int(limit) - 1)  # Subtract 1 second as a safety margin.
                     # If the count is still too large after removing scores, we have to sleep.
-                    while redis.zcard(key_str) >= int(limits[limit]):
+                    while redis.zcard(key_str) >= int(limits[limit]) - int(redis.get("lolapi_clients")):
                         sleep_time = redis.zrange(key_str, 0, 0, withscores=True)[0][1] + int(limit) - int(redis.time()[0]) + 1  # Sleep an extra second as a safety margin
                         time.sleep(sleep_time)
                         redis.zremrangebyrank(key_str, 0, 0)
